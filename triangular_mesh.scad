@@ -3,7 +3,7 @@ $fs=.1;
 function flatten(l) = [ for (a = l) for (b = a) b ] ;
 
 module female_latch (radius, length, thickness, width) {
-    central_thickness = length-thickness;
+    central_thickness = length-.5*thickness;
     pts_round = flatten([
         for (angle=[0:-2:-90])
             let (
@@ -32,7 +32,22 @@ module female_triangle(radius, length, thickness, width ) {
     for (angle=[30:120:270])
         rotate([0,0,angle])
         female_latch(radius, length, thickness, width);
-    translate([0,0,-thickness]) rotate([0,0,-30]) linear_extrude(height=thickness-1) circle($fn=3,2*length);
+    translate([0,0,-thickness]) rotate([0,0,-30]) linear_extrude(height=thickness-1) circle($fn=3,r=2*length-thickness);
 }
 
-female_triangle(4,20,2,4);
+module hexagonal_paving(ii, jj, length) {
+    paving_class = (ii+jj)%2 != 0;
+    radius = 2*length;
+    delta_ii = sqrt(3)/2*radius;
+    delta_jj = 3*radius/2;
+    translate([delta_ii*ii,delta_jj*jj+(paving_class ? radius/2 : 0),0])
+    rotate([0,0,paving_class ? 60 : 0])
+    color([paving_class ? 1 : 0, paving_class ? 0 : 1])
+    children(paving_class ? 1 : 0);
+}
+
+for (ii=[-2:2]) for (jj=[-2:2])
+    hexagonal_paving(ii, jj, 20) {
+        female_triangle(4,20,2,4);
+        female_triangle(4,20,2,2);
+    }
