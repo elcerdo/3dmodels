@@ -34,9 +34,9 @@ module male_latch(radius, length, thickness, width) {
     shift = radius-radius_+thickness;
     translate([length-radius_,0,radius-radius_]) rotate([90,0,0]) {
         cylinder(r=radius_, h=width+thickness, center=true);
-        for (kk=[-width, width]) translate([0,0,kk]) hull() {
+        for (kk=[-width/2-thickness/2, width/2+thickness/2]) translate([0,0,kk]) hull() {
             cylinder(r=radius_, h=thickness, center=true);
-            translate([-shift,-shift,0]) translate([-radius_,0,-thickness/2]) cube([2*radius_, thickness, thickness]);
+            translate([-shift,-shift,0]) translate([-radius_,0,-thickness/2]) cube([sqrt(2)*radius+thickness, thickness, thickness]);
         }
     }
 }
@@ -45,14 +45,24 @@ module female_triangle(radius, length, thickness, width) {
     for (angle=[60:120:300])
         rotate([0,0,angle])
         female_latch(radius, length, thickness, width);
-    translate([0,0,-thickness]) linear_extrude(height=thickness) circle($fn=3,r=2*length-margin);
+    translate([0,0,-thickness])
+        linear_extrude(height=thickness)
+        circle($fn=3,r=2*length-margin);
 }
 
 module male_triangle(radius, length, thickness, width) {
     for (angle=[60:120:300])
         rotate([0,0,angle])
         male_latch(radius, length, thickness, width);
-    translate([0,0,-thickness]) linear_extrude(height=thickness) circle($fn=3,r=2*length-margin);
+    translate([0,0,-thickness]) difference() {
+        linear_extrude(height=thickness) circle($fn=3,r=2*length-margin);
+        union() {
+        for (angle=[60:120:300])
+            rotate([0,0,angle])
+            translate([length-sqrt(2)*radius-thickness,-width/2,-1])
+            cube([sqrt(2)*radius+thickness+1,width,thickness+2]);
+        }
+    }
 }
 
 module hexagonal_paving(ii, jj, length) {
@@ -68,6 +78,6 @@ module hexagonal_paving(ii, jj, length) {
 
 for (ii=[-2:2]) for (jj=[-2:2])
     hexagonal_paving(ii, jj, 20) {
-        rotate([0,0,-30]) male_triangle(4,20,2,2);
+        rotate([0,0,-30]) male_triangle(4,20,2,6);
         rotate([0,0,-30]) female_triangle(4,20,2,2);
     }
