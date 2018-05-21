@@ -1,10 +1,9 @@
 $fs=.1;
-margin=0;
 
 function flatten(l) = [ for (a = l) for (b = a) b ] ;
 
-module female_latch(radius, length, thickness, width) {
-    central_thickness = length;
+module female_latch(radius, length, thickness, width, margin) {
+    central_thickness = length-margin/2;
     pts_round = flatten([
         for (angle=[0:-2:-90])
             let (
@@ -29,31 +28,32 @@ module female_latch(radius, length, thickness, width) {
         polygon(pts, [ind_out, ind_in], 4);
 }
 
-module male_latch(radius, length, thickness, width) {
+module male_latch(radius, length, thickness, width, margin) {
     radius_ = radius/(1+sqrt(2));
     shift = radius-radius_+thickness;
     translate([length-radius_,0,radius-radius_]) rotate([90,0,0]) {
-        cylinder(r=radius_, h=width+thickness, center=true);
+        cylinder(r=radius_-margin/2, h=width+thickness, center=true);
         for (kk=[-width/2-thickness/2, width/2+thickness/2]) translate([0,0,kk]) hull() {
-            cylinder(r=radius_, h=thickness, center=true);
-            translate([-shift,-shift,0]) translate([-radius_,0,-thickness/2]) cube([sqrt(2)*radius+thickness, thickness, thickness]);
+            cylinder(r=radius_-margin/2, h=thickness, center=true);
+            translate([-radius_-shift,-shift,-thickness/2])
+                cube([sqrt(2)*radius+thickness-margin/2, thickness, thickness]);
         }
     }
 }
 
-module female_triangle(radius, length, thickness, width) {
+module female_triangle(radius, length, thickness, width, margin) {
     for (angle=[60:120:300])
         rotate([0,0,angle])
-        female_latch(radius, length, thickness, width);
+        female_latch(radius, length, thickness, width, margin);
     translate([0,0,-thickness])
         linear_extrude(height=thickness)
         circle($fn=3,r=2*length-margin);
 }
 
-module male_triangle(radius, length, thickness, width) {
+module male_triangle(radius, length, thickness, width, margin) {
     for (angle=[60:120:300])
         rotate([0,0,angle])
-        male_latch(radius, length, thickness, width);
+        male_latch(radius, length, thickness, width, margin);
     translate([0,0,-thickness]) difference() {
         linear_extrude(height=thickness) circle($fn=3,r=2*length-margin);
         union() {
@@ -76,8 +76,13 @@ module hexagonal_paving(ii, jj, length) {
     children(paving_class ? 1 : 0);
 }
 
-for (ii=[-2:2]) for (jj=[-2:2])
-    hexagonal_paving(ii, jj, 20) {
-        rotate([0,0,-30]) male_triangle(4,20,2,6);
-        rotate([0,0,-30]) female_triangle(4,20,2,2);
-    }
+module mesh(radius, spacing, thickness, width, margin, nn) {
+    translate([0, 0, thickness]) for (ii=[-nn:nn]) for (jj=[-nn:nn])
+        hexagonal_paving(ii, jj, spacing) {
+            rotate([0,0,-30]) male_triangle(radius, spacing, thickness, width+2*margin, margin);
+            rotate([0,0,-30]) female_triangle(radius, spacing, thickness, width, margin);
+        }
+}
+
+
+mesh(radius=4, spacing=15, thickness=2, margin=.5, width=4, nn=1);
