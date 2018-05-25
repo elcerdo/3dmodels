@@ -1,3 +1,5 @@
+$fn = 128;
+
 module link(width, margin) {
     total_length = 4*width+3*margin;
     total_height = 2*width+margin;
@@ -32,4 +34,27 @@ module links_grid(width, margin, nn) {
     }
 }
 
-links_grid(3, 2, 10);
+module round_grid(width, margin, nn, ring) {
+    radius = nn*4*(width+margin);
+    radius_ = radius+ring;
+    height = 2*width+margin;
+    difference() {
+        union() {
+            color([1,1,0]) difference() {
+                translate([-radius_-1,-radius_-1,-1e-2])
+                cube([2*radius_+2,2*radius_+2,height+2e-2]);
+                translate([0,0,-1])
+                cylinder(h=height+2, r=radius);
+            }
+            links_grid(width, margin, nn);
+        }
+        color([1,0,1]) difference() {
+            translate([-radius_-2,-radius_-2,-1])
+            cube([2*radius_+4,2*radius_+4,height+2]);
+            translate([0,0,-1])
+            cylinder(h=height+4, r=radius_);
+        }
+    }
+}
+
+round_grid(3,2,5,15);
