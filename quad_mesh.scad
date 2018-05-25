@@ -41,8 +41,8 @@ module round_grid(width, margin, nn, ring) {
     difference() {
         union() {
             color([1,1,0]) difference() {
-                translate([-radius_-1,-radius_-1,-1e-2])
-                cube([2*radius_+2,2*radius_+2,height+2e-2]);
+                translate([-radius_-1,-radius_-1,0])
+                cube([2*radius_+2,2*radius_+2,height]);
                 translate([0,0,-1])
                 cylinder(h=height+2, r=radius);
             }
