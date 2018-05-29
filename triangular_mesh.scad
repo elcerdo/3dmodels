@@ -59,8 +59,9 @@ module male_triangle(radius, length, thickness, width, margin) {
         union() {
         for (angle=[60:120:300])
             rotate([0,0,angle])
-            translate([length-sqrt(2)*radius-thickness,-width/2,-1])
-            cube([sqrt(2)*radius+thickness+1,width,thickness+2]);
+            translate([length-sqrt(2)*radius+1,-width/2,-1])
+            //cube([sqrt(2)*radius+thickness+1,width,thickness+2]);
+               cube([sqrt(2)*radius,width,thickness+2]);
         }
     }
 }
@@ -85,4 +86,4 @@ module mesh(radius, spacing, thickness, width, margin, nn) {
 }
 
 
-mesh(radius=4, spacing=15, thickness=2, margin=.5, width=4, nn=1);
+mesh(radius=8, spacing=18, thickness=4, margin=1.5, width=8, nn=1);
