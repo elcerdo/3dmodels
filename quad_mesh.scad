@@ -57,6 +57,7 @@ module round_grid(width, margin, nn, ring) {
     }
 }
 
-//round_grid(3,2,5,15);
-round_grid(4,2,3,10);
+//round_grid(3,2,5,15); //version 0
+//round_grid(4,2,3,10); //version 1
+links_grid(2,1,1);
 
