@@ -15,13 +15,13 @@ module link(radius_, thick_, height) {
     color("blue")
     union() {
         linear_extrude(thick)
-         #hull() for(kk=[0:1:5]) {
+         hull() for(kk=[0:1:5]) {
             circn(radius, thick, kk+0);
             circn(radius, thick, kk+1);
         };
         linear_extrude(height)
         for(kk=[0:1:5]) hull() {
-            #circn(radius, thick, kk);
+            circn(radius, thick, kk);
         };        
         translate([0,0,height-thick])
         linear_extrude(thick)
@@ -59,11 +59,12 @@ module link_(radius, thick, height, margin) {
     }
 }
 
-margin=1;
-radius=10;
-thickness=3;
+margin=.5;
+radius=15;
+thickness=2;
 height=10;
-for (angle=[0,120,240]) rotate(angle) translate([radius+thickness/2+margin,0,0])
-link(radius, thickness, height);
+for (angle=[0,120,240]) rotate(angle)
+    translate([radius+thickness/2+margin,0,0])
+    link(radius, thickness, height);
 
-color("green") link_(radius, thickness, height, margin);
+!color("green") link_(radius, thickness, height, margin);
