@@ -8,7 +8,7 @@ module circn (radius, thick, nn) {
 };
 
 
-
+// .869 is sqrt(3)/2
 module link(radius_, thick_, height) {
     radius = radius_;
     thick = thick_*(.869);
@@ -68,24 +68,34 @@ module link_(radius, thick, height, margin) {
     }
 }
 
-module hex_grid(nn, separation) {
-    for (ii=[-nn:nn]) {
-        parity = ii%2;
-        angle = 60*ii;
-        translate([ii*2*separation,0,0])
-        rotate(parity ? angle : angle)
-        children();
-    }
+
+module hexagonal_paving(ii, jj, length) {
+    paving_class = (jj)%2 != 0;
+    translate([length*(3*ii+1.5*(paving_class ? 1 :0)),length*sqrt(3)/2*jj,0])
+//    rotate([0,0,paving_class ? 60 : 0])
+//    color([paving_class ? 1 : 0, paving_class ? 0 : 1])
+    children(paving_class ? 1 : 0);
 }
 
-margin=2;
-radius=25;
+module main(radius, thickness, height, margin, nn) {
+    spacing = radius+thickness/2+margin;
+    for (ii=[-nn:nn]) for (jj=[-2*nn:2*nn])
+        hexagonal_paving(ii, jj, spacing) {
+            link(radius, thickness, height);
+            link(radius, thickness, height);
+        }
+    translate([spacing,0,0])for (ii=[-nn:nn]) for (jj=[-2*nn:2*nn])
+        hexagonal_paving(ii, jj, spacing) {
+            color("green") rotate(60) link_(radius, thickness, height, margin);
+            rotate(60) link_(radius, thickness, height, margin);
+        }
+}
+
+margin=1;
+radius=20;
 thickness=5;
 height=20;
-separation = radius+thickness/2;
-//translate([separation,0,0])
-hex_grid(1, 2*radius+thickness)
-    link(radius, thickness, height);
+main(radius, thickness, height, margin, 2);
 
-hex_grid(1, radius+thickness/2)
-color("green") link_(radius, thickness, height, margin);
+//hex_grid(1, radius+thickness/2)
+//color("green") link_(radius, thickness, height, margin);
