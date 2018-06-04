@@ -30,17 +30,17 @@ module link(radius_, thick_, height) {
             circn(radius, thick, kk+1);
         };
     };
-    color("red")
-    translate([0,0,-11])
-    linear_extrude(10)
-    difference() {
-        circle(radius_+thick_/2, $fn=6);
-        circle(radius_-thick_/2, $fn=6);
-    };
+//    color("red")
+//    translate([0,0,-11])
+//    linear_extrude(10)
+//    difference() {
+//        circle(radius_+thick_/2, $fn=6);
+//        circle(radius_-thick_/2, $fn=6);
+//    };
 }
 
 module link_(radius, thick, height, margin) {
-    radius_ = margin+thick/2;
+    radius_ = 2*margin+thick/2;
     thick_ = thick*.869;
     margin_ = margin*.869;
     radius__ = margin_+thick_/2;
@@ -79,23 +79,31 @@ module hexagonal_paving(ii, jj, length) {
 
 module main(radius, thickness, height, margin, nn) {
     spacing = radius+thickness/2+margin;
+    for (ii=[-nn:nn]) for (jj=[-2*nn-1:2*nn+1])
+        hexagonal_paving(ii, jj, spacing) {
+            link(radius, thickness, height);
+            link(radius, thickness, height);
+        };
+    color("green")
+    translate([spacing,0,0])
     for (ii=[-nn:nn]) for (jj=[-2*nn:2*nn])
         hexagonal_paving(ii, jj, spacing) {
-            link(radius, thickness, height);
-            link(radius, thickness, height);
-        }
-    translate([spacing,0,0])for (ii=[-nn:nn]) for (jj=[-2*nn:2*nn])
-        hexagonal_paving(ii, jj, spacing) {
-            color("green") rotate(60) link_(radius, thickness, height, margin);
             rotate(60) link_(radius, thickness, height, margin);
-        }
+            rotate(60) link_(radius, thickness, height, margin);
+        };
+    translate([-spacing,0,0])
+    for (ii=[-nn+1:nn]) for (jj=[-2*nn:2*nn])
+        hexagonal_paving(ii, jj, spacing) {
+            rotate(0) link_(radius, thickness, height, margin);
+            rotate(0) link_(radius, thickness, height, margin);
+        };
 }
 
 margin=1;
 radius=20;
 thickness=5;
 height=20;
-main(radius, thickness, height, margin, 2);
+main(radius, thickness, height, margin, 0);
 
 //hex_grid(1, radius+thickness/2)
 //color("green") link_(radius, thickness, height, margin);
