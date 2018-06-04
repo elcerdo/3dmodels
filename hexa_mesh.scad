@@ -45,26 +45,47 @@ module link_(radius, thick, height, margin) {
     margin_ = margin*.869;
     radius__ = margin_+thick_/2;
     height_ = height-2*thick_-2*margin;
-    //link(radius_, thick, height);
+    radius_mid = radius_+radius__+
+    thick_/2;
+    thick_mid = thick_;
     translate([0,0,thick_+margin]) {
-        difference() {
-            linear_extrude(height_)
-            hull() for(kk=[0:2:5]) 
-            circn(radius_, 2*radius__+2*thick_, kk);
-            translate([0,0,-.01])
-            linear_extrude(height_+.02)
-            hull() for(kk=[0:2:5]) 
-            circn(radius_, 2*radius__, kk);
+        union() {
+            linear_extrude(height-thick_-margin)
+            for(kk=[0:2:5]) hull() {
+                circn(radius_mid, thick_mid, kk);
+            };
+            difference() {
+                linear_extrude(height_)
+                hull() for(kk=[0:2:5]) 
+                circn(radius_, 2*radius__+2*thick_, kk);
+
+                translate([0,0,-.01])
+                linear_extrude(height_+.02)
+                hull() for(kk=[0:2:5]) 
+                circn(radius_, 2*radius__, kk);    
+            };
         }
     }
 }
 
-margin=.5;
-radius=15;
-thickness=2;
-height=10;
-for (angle=[0,120,240]) rotate(angle)
-    translate([radius+thickness/2+margin,0,0])
+module hex_grid(nn, separation) {
+    for (ii=[-nn:nn]) {
+        parity = ii%2;
+        angle = 60*ii;
+        translate([ii*2*separation,0,0])
+        rotate(parity ? angle : angle)
+        children();
+    }
+}
+
+margin=2;
+radius=25;
+thickness=5;
+height=20;
+separation = radius+thickness/2;
+//translate([separation,0,0])
+hex_grid(1, 2*radius+thickness)
     link(radius, thickness, height);
 
-!color("green") link_(radius, thickness, height, margin);
+hex_grid(1, radius+thickness/2)
+color("green") link_(radius, thickness, height, margin);
