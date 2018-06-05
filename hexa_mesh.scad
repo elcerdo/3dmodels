@@ -1,4 +1,4 @@
-$fs=.1;
+$fs=1;
 
 
 
@@ -47,7 +47,7 @@ module link_(radius, thick, height, margin) {
     height_ = height-2*thick_-2*margin;
     radius_mid = radius_+radius__+
     thick_/2;
-    thick_mid = thick_;
+    thick_mid = thick_*.8;
     translate([0,0,thick_+margin]) {
         union() {
             linear_extrude(height-thick_-margin)
@@ -79,20 +79,21 @@ module hexagonal_paving(ii, jj, length) {
 
 module main(radius, thickness, height, margin, nn) {
     spacing = radius+thickness/2+margin;
-    for (ii=[-nn:nn]) for (jj=[-2*nn-1:2*nn+1])
+    for (ii=[-nn:nn]) for (jj=[-2*nn:2*nn])
         hexagonal_paving(ii, jj, spacing) {
             link(radius, thickness, height);
             link(radius, thickness, height);
         };
     color("green")
     translate([spacing,0,0])
-    for (ii=[-nn:nn]) for (jj=[-2*nn:2*nn])
+    for (ii=[-nn:nn]) for (jj=[-nn:nn])
         hexagonal_paving(ii, jj, spacing) {
             rotate(60) link_(radius, thickness, height, margin);
             rotate(60) link_(radius, thickness, height, margin);
         };
+    color("yellow")
     translate([-spacing,0,0])
-    for (ii=[-nn+1:nn]) for (jj=[-2*nn:2*nn])
+    for (ii=[-nn:nn]) for (jj=[-nn:nn])
         hexagonal_paving(ii, jj, spacing) {
             rotate(0) link_(radius, thickness, height, margin);
             rotate(0) link_(radius, thickness, height, margin);
@@ -103,7 +104,7 @@ margin=1;
 radius=20;
 thickness=5;
 height=20;
-main(radius, thickness, height, margin, 0);
+main(radius, thickness, height, margin, 1);
 
 //hex_grid(1, radius+thickness/2)
 //color("green") link_(radius, thickness, height, margin);
