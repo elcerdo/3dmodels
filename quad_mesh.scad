@@ -57,7 +57,25 @@ module round_grid(width, margin, nn, ring) {
     }
 }
 
-//round_grid(3,2,5,15); //version 0
+module square_grid(width, margin, nn, ring) {
+    radius = nn*4*(width+margin)+margin;
+    radius_ = radius+ring;
+    height = 2*width+margin;
+    union() {
+        difference() {
+            translate([-radius_,-radius_,0])
+            cube([2*radius_,2*radius_,height]);
+            translate([-radius,-radius,-1])
+            cube([2*radius,2*radius,height+2]);
+        }
+        links_grid(width, margin, nn);
+    }
+
+}
+
+//round_grid(3,2,5,15); //version 0 : printed by roland denis
 //round_grid(4,2,3,10); //version 1
-links_grid(2,1,1);
+//links_grid(2,1,1); // version 2
+square_grid(3,1.5,5,10); //version 3
+
 
